@@ -1,36 +1,14 @@
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
 from fastapi import HTTPException, APIRouter, Depends, Form
 
 from db import get_db
 from models import Users
+from schemas import RegisterResponse, UserCreate, LoginResponse, UserResponse
 from utils import hash_password, verify_password, create_access_token, get_current_user
 
 router = APIRouter(
     tags=["auth"]
 )
-
-
-class UserCreate(BaseModel):
-    username: str
-    password: str
-    email: str
-    age: int
-    nickname: str | None = None
-
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
-
-class RegisterResponse(BaseModel):
-    message: str
-    access_token: str
-    token_type: str
-
-class LoginResponse(BaseModel):
-    access_token: str
-    token_type: str
 
 @router.post("/register", response_model=RegisterResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)) -> RegisterResponse:
@@ -64,14 +42,6 @@ def login_user\
 
     access_token = create_access_token(data={"sub": username})
     return LoginResponse(access_token=access_token, token_type="bearer")
-
-
-class UserResponse(BaseModel):
-    username: str
-    email: str
-    age: int
-    nickname: str | None = None
-    admin: bool
 
 
 @router.get("/login_test", response_model=UserResponse)

@@ -12,7 +12,7 @@ class Users(Base):
     email = Column(String(45), nullable=False)
     age = Column(Integer, nullable=False)
     nickname = Column(String(45), nullable=True)
-    admin = Column(Boolean, nullable=True)
+    admin = Column(Integer, nullable=True)
 
     # Relationships
     topics = relationship("Topic", back_populates="user")
