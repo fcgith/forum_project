@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from datetime import datetime, timedelta
 from fastapi import HTTPException, APIRouter, Depends
 
 from db import get_db
@@ -18,7 +17,6 @@ class UserCreate(BaseModel):
     email: str
     age: int
     nickname: str | None = None
-    registration_date: str  # expecting a string like "2025-04-05"
 
 
 class UserLogin(BaseModel):
@@ -48,7 +46,6 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)) -> RegisterRe
         email=user.email,
         age=user.age,
         nickname=user.nickname,
-        registration_date=datetime.strptime(user.registration_date, "%Y-%m-%d").date(),
         admin=False
     )
     db.add(new_user)

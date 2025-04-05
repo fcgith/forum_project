@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`users` (
   `email` VARCHAR(45) NOT NULL,
   `age` INT NOT NULL,
   `nickname` VARCHAR(45) NULL,
-  `registration_date` DATE NOT NULL,
+  `registration_date` DATE NOT NULL DEFAULT NOW(),
   `admin` TINYINT(1) NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC),

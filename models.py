@@ -12,7 +12,6 @@ class Users(Base):
     email = Column(String(45), nullable=False)
     age = Column(Integer, nullable=False)
     nickname = Column(String(45), nullable=True)
-    registration_date = Column(Date, nullable=False)
     admin = Column(Boolean, nullable=True)
 
     # Relationships
