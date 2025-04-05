@@ -36,9 +36,10 @@ class LoginResponse(BaseModel):
 
 @router.post("/register", response_model=RegisterResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)) -> RegisterResponse:
-    db_user = db.query(Users).filter(Users.username.__eq__(user.username)).first()
-    if db_user:
-        raise HTTPException(status_code=400, detail=f"User with username {user.username} already exists")
+    username_check = db.query(Users).filter(Users.username.__eq__(user.username)).first()
+    email_check = db.query(Users).filter(Users.email.__eq__(user.email)).first()
+    if username_check or email_check:
+        raise HTTPException(status_code=400, detail=f"User with username the provided credentials already exists")
 
     hashed_password = hash_password(user.password)
     new_user = Users(
