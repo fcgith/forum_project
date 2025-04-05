@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from fastapi import HTTPException, APIRouter, Depends
+from fastapi import HTTPException, APIRouter, Depends, Form
 
 from db import get_db
 from models import Users
@@ -55,13 +55,14 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)) -> RegisterRe
     return RegisterResponse(message="User created successfully", access_token=access_token, token_type="bearer")
 
 @router.post("/login", response_model=LoginResponse)
-def login_user(user: UserLogin, db: Session = Depends(get_db)) -> LoginResponse:
-    db_user = db.query(Users).filter(Users.username.__eq__(user.username)).first()
+def login_user\
+        (username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)) -> LoginResponse:
+    db_user = db.query(Users).filter(Users.username.__eq__(username)).first()
     if (not db_user or
-            not verify_password(user.password, db_user.hashed_password)):
+            not verify_password(password, db_user.hashed_password)):
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
-    access_token = create_access_token(data={"sub": user.username})
+    access_token = create_access_token(data={"sub": username})
     return LoginResponse(access_token=access_token, token_type="bearer")
 
 
@@ -70,18 +71,18 @@ class UserResponse(BaseModel):
     email: str
     age: int
     nickname: str | None = None
-    registration_date: str
-
-    pass
+    admin: bool
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get("/login_test", response_model=UserResponse)
 def get_user_profile(current_user: Users = Depends(get_current_user)) -> UserResponse:
-    return UserResponse(
+    result = UserResponse\
+    (
         username=current_user.username,
         email=current_user.email,
         age=current_user.age,
         nickname=current_user.nickname,
-        registration_date=current_user.registration_date.isoformat(),
         admin=current_user.admin
     )
+
+    return result
