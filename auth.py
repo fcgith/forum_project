@@ -39,7 +39,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)) -> RegisterRe
     username_check = db.query(Users).filter(Users.username.__eq__(user.username)).first()
     email_check = db.query(Users).filter(Users.email.__eq__(user.email)).first()
     if username_check or email_check:
-        raise HTTPException(status_code=400, detail=f"User with username the provided credentials already exists")
+        raise HTTPException(status_code=400, detail=f"User with the provided credentials already exists")
 
     hashed_password = hash_password(user.password)
     new_user = Users(
