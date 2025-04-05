@@ -4,7 +4,7 @@ from fastapi import HTTPException, APIRouter, Depends
 
 from db import get_db
 from models import Users
-from utils import hash_password, verify_password, create_access_token
+from utils import hash_password, verify_password, create_access_token, get_current_user
 
 router = APIRouter(
     tags=["auth"]
@@ -64,3 +64,24 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)) -> LoginResponse:
     access_token = create_access_token(data={"sub": user.username})
     return LoginResponse(access_token=access_token, token_type="bearer")
 
+
+class UserResponse(BaseModel):
+    username: str
+    email: str
+    age: int
+    nickname: str | None = None
+    registration_date: str
+
+    pass
+
+
+@router.get("/me", response_model=UserResponse)
+def get_user_profile(current_user: Users = Depends(get_current_user)) -> UserResponse:
+    return UserResponse(
+        username=current_user.username,
+        email=current_user.email,
+        age=current_user.age,
+        nickname=current_user.nickname,
+        registration_date=current_user.registration_date.isoformat(),
+        admin=current_user.admin
+    )
