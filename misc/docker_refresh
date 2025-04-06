@@ -1,0 +1,30 @@
+VPS:
+
+cd /home/siso/forum_project/forum_project
+git pull
+docker stop siso_forum; docker stop siso-postgres
+docker rm siso_forum
+docker build -t forum_app .
+docker start siso-postgres
+docker run -d -p 65000:8080 --name siso_forum \
+  -e DB_USER=postgres \
+  -e DB_PASSWORD=******* \
+  -e DB_HOST=172.245.56.116 \
+  -e DB_PORT=**** \
+  -e DB_NAME=forum_project \
+  forum_app
+
+
+MAC:
+
+cd /Users/steliyan/Documents/recipesp/forum_project/
+docker stop siso_forum
+docker rm siso_forum
+docker build -t forum_app .
+docker run -d -p 65000:8080 --name siso_forum \
+  -e DB_USER=postgres \
+  -e DB_PASSWORD=******* \
+  -e DB_HOST=172.245.56.116 \
+  -e DB_PORT=**** \
+  -e DB_NAME=forum_project \
+  forum_app
