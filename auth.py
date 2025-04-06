@@ -3,8 +3,8 @@ from fastapi import HTTPException, APIRouter, Depends, Form
 
 from db import get_db
 from models import Users
-from schemas import RegisterResponse, UserCreate, LoginResponse, UserResponse
-from utils import hash_password, verify_password, create_access_token, get_current_user, verify_unique
+from schemas import RegisterResponse, UserCreate, LoginResponse
+from utils import hash_password, verify_password, create_access_token, verify_unique
 
 router = APIRouter(
     tags=["auth"]

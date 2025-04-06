@@ -35,3 +35,10 @@ class AdminResponse(BaseModel):
     age: int
     nickname: str
     admin: bool
+
+# CONTENT
+
+class CategorySchema(BaseModel):
+    id: int
+    name: str
+    desc: str

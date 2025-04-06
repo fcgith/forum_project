@@ -1,5 +1,4 @@
-# models.py
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Text, Date
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from db import Base
 
@@ -74,8 +73,9 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(45), nullable=False)
-    desc = Column(String(255), nullable=True)
+    description = Column(String(255), nullable=True)
     visibility = Column(Boolean, default=True)
+    locked = Column(Boolean, default=False)
 
     # Relationships
     topics = relationship("Topic", back_populates="category")

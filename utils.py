@@ -8,8 +8,10 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from db import get_db
-from models import Users
+from models import Users, Category, CategoryAccessPrivilege
 from schemas import UserCreate
+
+# AUTH
 
 SECRET_KEY = "test-key"
 ALGORITHM = "HS256"
@@ -37,7 +39,7 @@ def create_access_token(data: dict) -> str:
 
 def get_current_user\
         (token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> Type[Users]:
-
+    # Access token verification, makes sure it's a valid such
     credentials_exception = HTTPException\
     (
         status_code=401,
@@ -61,6 +63,7 @@ def get_current_user\
     return user
 
 def get_admin(current_user: Users = Depends(get_current_user)) -> Users | None:
+    # Checks if the logged-in user, if such, is an admin
     if not current_user.admin:
         not_admin = HTTPException\
             (
@@ -69,3 +72,21 @@ def get_admin(current_user: Users = Depends(get_current_user)) -> Users | None:
             )
         raise not_admin
     return current_user
+
+# CONTENT
+
+def can_user_see_category(user: Users, category: Type[Category], db: Session) -> bool:
+    # Privileges will be 0/1 or False/True and None when general such apply
+    # Admins can see all
+    if user.admin:
+        return True
+
+    privilege = db.query(CategoryAccessPrivilege).filter\
+    (
+        CategoryAccessPrivilege.user_id.__eq__(user.id),
+        CategoryAccessPrivilege.category_id.__eq__(category.id)
+    ).first()
+
+    if not privilege:
+        return bool(category.visibility)
+    return category.visibility and privilege.permission_type
