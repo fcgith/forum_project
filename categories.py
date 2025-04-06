@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Type
 
 from fastapi import APIRouter, Depends, Form, HTTPException
 from sqlalchemy.orm import Session
 
 from db import get_db
-from models import Users, Category
-from schemas import CategorySchema
+from models import Users, Category, Topic
+from schemas import CategorySchema, TopicSchema
 from utils import get_current_user, can_user_see_category, get_admin
 
 router = APIRouter(
@@ -47,3 +47,17 @@ def add_category\
     entry = db.query(Category).filter(Category.name.__eq__(name)).first()
 
     return CategorySchema(id=entry.id, name=name, desc=desc)
+
+@router.get("/{category_id}", response_model=List[TopicSchema])
+def get_topics_in_category\
+        (category_id: int, db: Session = Depends(get_db), user: Users = Depends(get_current_user)) -> list[Type[Topic]]:
+
+    category = db.query(Category).filter(Category.id.__eq__(category_id)).first()
+
+    if (not category or
+        not can_user_see_category(user, category, db)):
+        raise HTTPException(status_code=403, detail="Invalid category")
+
+    # Get all topics within this category
+    topics = db.query(Topic).filter(Topic.category_id.__eq__(category.id)).all()
+    return topics

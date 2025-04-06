@@ -42,3 +42,12 @@ class CategorySchema(BaseModel):
     id: int
     name: str
     desc: str
+    locked: bool = False
+
+class TopicSchema(BaseModel):
+    id: int
+    title: str
+    description: str | None
+    locked: bool
+    user_id: int
+    category_id: int

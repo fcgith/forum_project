@@ -29,7 +29,7 @@ class Topic(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(45), nullable=False)
-    desc = Column(String(255), nullable=True)
+    description = Column(String(255), nullable=True)
     locked = Column(Boolean, default=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
