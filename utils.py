@@ -29,7 +29,7 @@ def create_access_token(data: dict) -> str:
     return encoded_jwt
 
 def get_current_user\
-                (token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> Type[Users]:
+        (token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> Type[Users]:
 
     credentials_exception = HTTPException\
     (
@@ -52,3 +52,13 @@ def get_current_user\
     if user is None:
         raise credentials_exception
     return user
+
+def get_admin(current_user: Users = Depends(get_current_user)) -> Users | None:
+    if not current_user.admin:
+        not_admin = HTTPException\
+            (
+                status_code=403,
+                detail="You do not have permission to access this page."
+            )
+        raise not_admin
+    return current_user

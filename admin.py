@@ -3,29 +3,20 @@ from pydantic import BaseModel
 
 from models import Users
 from schemas import AdminResponse
-from utils import get_current_user
+from utils import get_current_user, get_admin
 
 router = APIRouter(
     tags=["admin"]
 )
 
 @router.get("/", response_model=AdminResponse)
-def admin_access(current_user: Users = Depends(get_current_user)) -> AdminResponse:
-    if not current_user.admin:
-        not_admin = HTTPException\
-            (
-                status_code=403,
-                detail="You do not have permission to access this page."
-            )
-        raise not_admin
-
+def admin_access_test(admin: Users = Depends(get_admin)) -> AdminResponse:
     result = AdminResponse\
     (
-        username=current_user.username,
-        email=current_user.email,
-        age=current_user.age,
-        nickname=current_user.nickname,
-        admin=current_user.admin
+        username=admin.username,
+        email=admin.email,
+        age=admin.age,
+        nickname=admin.nickname,
+        admin=admin.admin
     )
-
     return result

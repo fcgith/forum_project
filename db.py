@@ -4,14 +4,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-SISO_FORUM_DB_USER = os.getenv("SISO_FORUM_DB_USER")
-SISO_FORUM_DB_PASSWORD = os.getenv("SISO_FORUM_DB_PASSWORD")
-SISO_FORUM_DB_HOST = os.getenv("SISO_FORUM_DB_HOST")
-SISO_FORUM_DB_PORT = os.getenv("SISO_FORUM_DB_PORT")
-SISO_FORUM_DB_NAME = os.getenv("SISO_FORUM_DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
 
 SQLALCHEMY_DATABASE_URL =\
-    f"postgresql+psycopg2://{SISO_FORUM_DB_USER}:{SISO_FORUM_DB_PASSWORD}@{SISO_FORUM_DB_HOST}:{SISO_FORUM_DB_PORT}/{SISO_FORUM_DB_NAME}"
+    f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 engine = create_engine\
 (
