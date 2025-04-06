@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends
 
 from models import Users
 from schemas import AdminResponse
-from utils import get_current_user, get_admin
+from utils import get_admin
 
 router = APIRouter(
     tags=["admin"]

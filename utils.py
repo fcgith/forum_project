@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from db import get_db
 from models import Users
+from schemas import UserCreate
 
 SECRET_KEY = "test-key"
 ALGORITHM = "HS256"
@@ -20,6 +21,12 @@ def hash_password(password: str) -> str:
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return hash_password(plain_password) == hashed_password
+
+def verify_unique(db: Session, user: UserCreate):
+    username_check = db.query(Users).filter(Users.username.__eq__(user.username)).first()
+    email_check = db.query(Users).filter(Users.email.__eq__(user.email)).first()
+    if username_check or email_check:
+        raise HTTPException(status_code=400, detail=f"User with the provided credentials already exists")
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()

@@ -15,8 +15,6 @@ class UserLogin(BaseModel):
 
 class RegisterResponse(BaseModel):
     message: str
-    access_token: str
-    token_type: str
 
 class LoginResponse(BaseModel):
     access_token: str
@@ -36,4 +34,4 @@ class AdminResponse(BaseModel):
     email: str
     age: int
     nickname: str
-    admin: int
+    admin: bool
