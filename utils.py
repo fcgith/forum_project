@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from db import get_db
-from models import Users, Category, CategoryAccessPrivilege
+from models import Users, Category, CategoryAccessPrivilege, Topic
 from schemas import UserCreate
 
 # AUTH
@@ -17,6 +17,12 @@ SECRET_KEY = "test-key"
 ALGORITHM = "HS256"
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+access_denied = HTTPException \
+(
+        status_code=403,
+        detail="You do not have permission to access this page."
+)
 
 def hash_password(password: str) -> str:
     """
@@ -68,26 +74,19 @@ def get_current_user\
     :return: user data
     """
     # Access token verification, makes sure it's a valid such
-    credentials_exception = HTTPException\
-    (
-        status_code=401,
-        detail="Invalid credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
         if not username:
-            raise credentials_exception
+            raise access_denied
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.InvalidTokenError:
-        raise credentials_exception
+        raise access_denied
 
     user = db.query(Users).filter(Users.username.__eq__(username)).first()
     if user is None:
-        raise credentials_exception
+        raise access_denied
     return user
 
 def get_admin(current_user: Users = Depends(get_current_user)) -> Users | None:
@@ -98,12 +97,7 @@ def get_admin(current_user: Users = Depends(get_current_user)) -> Users | None:
     """
     # Checks if the logged-in user, if such, is an admin
     if not current_user.admin:
-        not_admin = HTTPException\
-            (
-                status_code=403,
-                detail="You do not have permission to access this page."
-            )
-        raise not_admin
+        raise access_denied
     return current_user
 
 # CONTENT
@@ -130,3 +124,10 @@ def can_user_see_category(user: Users, category: Type[Category], db: Session) ->
     if not privilege:
         return bool(category.visibility)
     return category.visibility and privilege.permission_type
+
+def can_user_see_topic(user: Users, topic: Type[Topic], db: Session) -> bool:
+    # TODO: Probably redundant but still a safety net
+    category = db.query(Category).filter(Category.id.__eq__(topic.category_id)).first()
+    if not can_user_see_category(user, category, db):
+        raise access_denied
+    return True
