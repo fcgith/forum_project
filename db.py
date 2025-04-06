@@ -23,6 +23,10 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 def get_db():
+    """
+    Creates a database connection and closes it after it has been used
+    :return: Session database
+    """
     db = SessionLocal()
     try:
         yield db

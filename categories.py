@@ -13,7 +13,13 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[CategorySchema])
-def get_categories(db: Session = Depends(get_db), user: Users = Depends(get_current_user)):
+def get_categories(db: Session = Depends(get_db), user: Users = Depends(get_current_user)) -> list:
+    """
+    Lists all visible categories for the logged-in user
+    :param db: database connection
+    :param user: user requesting access
+    :return: list of visible categories for logged-in user
+    """
     categories = db.query(Category).all()
     visible_categories =\
     [
@@ -26,6 +32,14 @@ def get_categories(db: Session = Depends(get_db), user: Users = Depends(get_curr
 @router.post("/add", response_model=CategorySchema)
 def add_category\
     (db: Session = Depends(get_db), admin: Users = Depends(get_admin), name: str = Form(...), desc: str = Form(...)) -> CategorySchema:
+    """
+    Adds a category to the database if the user is admin
+    :param db: database connection
+    :param admin: checks if user is an admin to verify permission
+    :param name: name of category
+    :param desc: description of category
+    :return: a category entry in the database, including ID
+    """
 
     # Unique names check
     name_check = db.query(Category).filter(Category.name.__eq__(name)).first()
@@ -51,6 +65,13 @@ def add_category\
 @router.get("/{category_id}", response_model=List[TopicSchema])
 def get_topics_in_category\
         (category_id: int, db: Session = Depends(get_db), user: Users = Depends(get_current_user)) -> list[Type[Topic]]:
+    """
+    API request for all topics in a given category
+    :param category_id: the id of the category
+    :param db: database connection
+    :param user: the user requesting access
+    :return: list[topics in category]
+    """
 
     category = db.query(Category).filter(Category.id.__eq__(category_id)).first()
 

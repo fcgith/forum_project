@@ -10,6 +10,9 @@ router = APIRouter(
 
 @router.get("/", response_model=AdminResponse)
 def admin_access_test(admin: Users = Depends(get_admin)) -> AdminResponse:
+    """
+    Initial admin page (probably wrong because it's more FE-focused)
+    """
     result = AdminResponse\
     (
         username=admin.username,
