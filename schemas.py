@@ -72,7 +72,7 @@ class PostSchema(BaseModel):
 class PostViewSchema(BaseModel):
     post: PostSchema
     interactions: int
-    user_vote: Optional[int] = None
+    user_vote: Optional[bool] = None
 
     class Config:
         from_attributes = True
