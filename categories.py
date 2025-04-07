@@ -9,7 +9,7 @@ from schemas import CategorySchema, TopicSchema
 from utils import get_current_user, can_user_see_category, get_admin
 
 router = APIRouter(
-    tags=["category"]
+    tags=["categories"]
 )
 
 @router.get("/", response_model=List[CategorySchema])
@@ -31,13 +31,13 @@ def get_categories(db: Session = Depends(get_db), user: Users = Depends(get_curr
 
 @router.post("/add", response_model=CategorySchema)
 def add_category\
-    (db: Session = Depends(get_db), admin: Users = Depends(get_admin), name: str = Form(...), desc: str = Form(...)) -> CategorySchema:
+    (db: Session = Depends(get_db), admin: Users = Depends(get_admin), name: str = Form(...), description: str = Form(...)) -> CategorySchema:
     """
     Adds a category to the database if the user is admin
     :param db: database connection
     :param admin: checks if user is an admin to verify permission
     :param name: name of category
-    :param desc: description of category
+    :param description: description of category
     :return: a category entry in the database, including ID
     """
 
@@ -49,7 +49,7 @@ def add_category\
     new_category = Category\
     (
         name=name,
-        description=desc,
+        description=description,
         visibility=1,
         locked=False
     )
@@ -60,7 +60,7 @@ def add_category\
 
     entry = db.query(Category).filter(Category.name.__eq__(name)).first()
 
-    return CategorySchema(id=entry.id, name=name, desc=desc)
+    return CategorySchema(id=entry.id, name=name, description=description)
 
 @router.get("/{category_id}", response_model=List[TopicSchema])
 def get_topics_in_category\

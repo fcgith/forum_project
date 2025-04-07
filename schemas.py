@@ -51,3 +51,12 @@ class TopicSchema(BaseModel):
     locked: bool
     user_id: int
     category_id: int
+
+
+class PostSchema(BaseModel):
+    id: int
+    title: str
+    content: str
+    user_id: int
+    topic_id: int
+    category_id: int
