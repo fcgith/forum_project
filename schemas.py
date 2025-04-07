@@ -1,4 +1,9 @@
+from typing import Optional
+
 from pydantic import BaseModel
+
+from models import Post
+
 
 # AUTH
 
@@ -60,3 +65,14 @@ class PostSchema(BaseModel):
     user_id: int
     topic_id: int
     category_id: int
+
+    class Config:
+        from_attributes = True
+
+class PostViewSchema(BaseModel):
+    post: PostSchema
+    interactions: int
+    user_vote: Optional[int] = None
+
+    class Config:
+        from_attributes = True
