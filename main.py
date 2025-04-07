@@ -7,7 +7,7 @@ app = FastAPI()
 
 app.include_router(auth_router, prefix="/auth")
 app.include_router(admin_router, prefix="/admin")
-app.include_router(category_router, prefix="/category")
+app.include_router(category_router, prefix="/categories")
 
 if __name__ == "__main__":
     import uvicorn

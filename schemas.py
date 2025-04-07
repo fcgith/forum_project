@@ -41,7 +41,7 @@ class AdminResponse(BaseModel):
 class CategorySchema(BaseModel):
     id: int
     name: str
-    desc: str
+    description: str
     locked: bool = False
 
 class TopicSchema(BaseModel):
