@@ -61,8 +61,9 @@ def create_access_token(data: dict) -> str:
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def get_current_user\
-        (token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> Type[Users]:
+def get_current_user(token: str = Depends(oauth2_scheme),
+                     db: Session = Depends(get_db)
+) -> Type[Users]:
     """
     Checks if the provided access token is invalid or expired and returns user data if valid
     """
@@ -93,7 +94,10 @@ def get_admin(current_user: Users = Depends(get_current_user)) -> Users | None:
 
 # CONTENT
 
-def can_user_see_category(user: Users, category: Type[Category], db: Session) -> bool:
+def can_user_see_category(user: Users,
+                          category: Type[Category],
+                          db: Session
+) -> bool:
     """
     Checks if user is logged in, if so checks if they have the permission to view the category
     """

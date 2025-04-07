@@ -1,10 +1,10 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Form
+from fastapi import APIRouter, Depends, Form
 from sqlalchemy.orm import Session
 
 from db import get_db
-from models import Users, Topic, Post, PostInteraction
+from models import Users, Topic, Post
 from schemas import PostSchema
 from utils import get_current_user, can_user_see_topic, not_found, access_denied
 
@@ -15,7 +15,8 @@ router = APIRouter(
 @router.get("/{topic_id}", response_model=List[PostSchema])
 def get_posts_in_topic(topic_id: int,
                        db: Session = Depends(get_db),
-                       user: Users = Depends(get_current_user)) -> list:
+                       user: Users = Depends(get_current_user)
+) -> list:
     """
     Lists all visible posts for the logged-in user
     """
@@ -32,9 +33,11 @@ def get_posts_in_topic(topic_id: int,
 
 @router.post("/{topic_id}/post", response_model=PostSchema)
 def add_post(topic_id: int,
-     db: Session = Depends(get_db),
-     user: Users = Depends(get_current_user),
-     title: str = Form(...), content: str = Form(...)) -> PostSchema:
+             db: Session = Depends(get_db),
+             user: Users = Depends(get_current_user),
+             title: str = Form(...),
+             content: str = Form(...)
+) -> PostSchema:
     """
     Adds a post to topic
     """

@@ -30,15 +30,13 @@ def get_categories(db: Session = Depends(get_db), user: Users = Depends(get_curr
     return visible_categories
 
 @router.post("/add", response_model=CategorySchema)
-def add_category\
-    (db: Session = Depends(get_db), admin: Users = Depends(get_admin), name: str = Form(...), description: str = Form(...)) -> CategorySchema:
+def add_category(db: Session = Depends(get_db),
+                 admin: Users = Depends(get_admin),
+                 name: str = Form(...),
+                 description: str = Form(...)
+) -> CategorySchema:
     """
     Adds a category to the database if the user is admin
-    :param db: database connection
-    :param admin: checks if user is an admin to verify permission
-    :param name: name of category
-    :param description: description of category
-    :return: a category entry in the database, including ID
     """
 
     # Unique names check
@@ -63,14 +61,12 @@ def add_category\
     return CategorySchema(id=entry.id, name=name, description=description)
 
 @router.get("/{category_id}", response_model=List[TopicSchema])
-def get_topics_in_category\
-        (category_id: int, db: Session = Depends(get_db), user: Users = Depends(get_current_user)) -> list[Type[Topic]]:
+def get_topics_in_category(category_id: int,
+                           db: Session = Depends(get_db),
+                           user: Users = Depends(get_current_user)
+) -> list[Type[Topic]]:
     """
     API request for all topics in a given category
-    :param category_id: the id of the category
-    :param db: database connection
-    :param user: the user requesting access
-    :return: list[topics in category]
     """
 
     category = db.query(Category).filter(Category.id.__eq__(category_id)).first()

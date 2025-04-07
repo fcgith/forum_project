@@ -12,7 +12,10 @@ router = APIRouter(
     tags=["posts"]
 )
 
-def get_post_and_topic(post_id: int, user: Users, db: Session) -> tuple[Type[Post], Type[Topic]]:
+def get_post_and_topic(post_id: int,
+                       user: Users,
+                       db: Session
+) -> tuple[Type[Post], Type[Topic]]:
     """
     Checks permission and existence of provided post and its topic/category
     """
@@ -58,9 +61,9 @@ def get_post_data(post_id: int,
 
 @router.post("/{post_id}/interaction", response_model=PostViewSchema)
 def add_or_change_user_interaction(post_id: int,
-                  vote: int = Form(...),
-                  db: Session = Depends(get_db),
-                  user: Users = Depends(get_current_user)
+                                   vote: int = Form(...),
+                                   db: Session = Depends(get_db),
+                                   user: Users = Depends(get_current_user)
 ) -> PostViewSchema:
     """
     Update or add post interaction. 1 for upvote, 0 to remove interaction, -1 for downvote
