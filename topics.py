@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from db import get_db
@@ -22,8 +22,12 @@ def get_posts_in_topic(topic_id: int, db: Session = Depends(get_db), user: Users
     :return: list of visible categories for logged-in user
     """
     topic = db.query(Topic).filter(Topic.id.__eq__(topic_id)).first()
+
+    if not topic:
+        raise HTTPException(status_code=404, detail="Topic not found")
+
     if can_user_see_topic(user, topic, db):
-        posts = db.query(Post).all()
+        posts = db.query(Post).filter(Post.topic_id.__eq__(topic_id)).all()
         posts =\
         [
             post for post in posts

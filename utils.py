@@ -127,7 +127,9 @@ def can_user_see_category(user: Users, category: Type[Category], db: Session) ->
 
 def can_user_see_topic(user: Users, topic: Type[Topic], db: Session) -> bool:
     # TODO: Probably redundant but still a safety net
-    category = db.query(Category).filter(Category.id.__eq__(topic.category_id)).first()
-    if not can_user_see_category(user, category, db):
-        raise access_denied
-    return True
+    if topic:
+        category = db.query(Category).filter(Category.id.__eq__(topic.category_id)).first()
+        if not can_user_see_category(user, category, db):
+            raise access_denied
+        return True
+    return False
