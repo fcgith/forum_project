@@ -13,6 +13,9 @@ router = APIRouter(
 )
 
 def get_post_and_topic(post_id: int, user: Users, db: Session) -> tuple[Type[Post], Type[Topic]]:
+    """
+    Checks permission and existence of provided post and its topic/category
+    """
     post = db.query(Post).filter(Post.id.__eq__(post_id)).first()
     if not post:
         raise not_found
@@ -31,7 +34,6 @@ def get_post_data(post_id: int,
     """
     View post and its interactions
     """
-
     post, topic = get_post_and_topic(post_id, user, db)
 
     interactions = db.query(PostInteraction).filter(PostInteraction.post_id.__eq__(post_id)).all()
@@ -61,7 +63,7 @@ def add_or_change_user_interaction(post_id: int,
                   user: Users = Depends(get_current_user)
 ) -> PostViewSchema:
     """
-    Update or add post interaction
+    Update or add post interaction. 1 for upvote, 0 to remove interaction, -1 for downvote
     """
 
     post, topic = get_post_and_topic(post_id, user, db)
