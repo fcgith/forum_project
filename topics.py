@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Form
 from sqlalchemy.orm import Session
 
 from db import get_db
@@ -16,10 +16,6 @@ router = APIRouter(
 def get_posts_in_topic(topic_id: int, db: Session = Depends(get_db), user: Users = Depends(get_current_user)) -> list:
     """
     Lists all visible posts for the logged-in user
-    :param topic_id: the category
-    :param db: database connection
-    :param user: user requesting access
-    :return: list of visible categories for logged-in user
     """
     topic = db.query(Topic).filter(Topic.id.__eq__(topic_id)).first()
 
@@ -34,3 +30,36 @@ def get_posts_in_topic(topic_id: int, db: Session = Depends(get_db), user: Users
         ]
         return posts
     return []
+
+@router.post("/{topic_id}/post", response_model=PostSchema)
+def add_post\
+    (topic_id: int, db: Session = Depends(get_db), user: Users = Depends(get_current_user), title: str = Form(...), content: str = Form(...)) -> PostSchema:
+    """
+    Adds a post to topic
+    """
+
+    topic = db.query(Topic).filter(Topic.id.__eq__(topic_id)).first()
+
+    if not topic:
+        raise HTTPException(status_code=404, detail="Topic not found")
+
+    if not can_user_see_topic(user, topic, db):
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    post = Post\
+    (
+        title = title,
+        content = content,
+        user_id = user.id,
+        topic_id = topic.id,
+        category_id = topic.category_id
+    )
+
+    db.add(post)
+    db.commit()
+    db.refresh(post)
+
+    user_posts = db.query(Post).filter(Post.user_id.__eq__(user.id)).all()
+    entry = [post for post in user_posts][-1]
+
+    return PostSchema(id=entry.id, title=title, content=content, user_id=user.id, topic_id=topic.id, category_id=topic.category_id)
