@@ -1,3 +1,5 @@
+from datetime import date
+
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, APIRouter, Depends, Form
 
@@ -40,6 +42,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)) -> RegisterRe
         email=user.email,
         age=user.age,
         nickname=user.nickname,
+        registration_date=date.today(),
         admin=False
     )
 
@@ -59,7 +62,7 @@ def login_user(username: str = Form(...),
     """
     user = db.query(Users).filter(Users.username.__eq__(username)).first()
 
-    if not all((user, verify_password(password, user.hashed_password))):
+    if not user or not verify_password(password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
     access_token = create_access_token(data={"sub": username})

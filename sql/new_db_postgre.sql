@@ -13,6 +13,7 @@ CREATE TABLE users (
 -- Create the categories table
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
     description TEXT NOT NULL,
     visibility BOOLEAN NOT NULL DEFAULT TRUE,
     locked BOOLEAN NOT NULL DEFAULT FALSE
