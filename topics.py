@@ -12,6 +12,13 @@ router = APIRouter(
     tags=["topics"]
 )
 
+def verify_topic_and_access(user, topic, db):
+    if not topic:
+        raise not_found
+
+    if not can_user_see_topic(user, topic, db):
+        raise access_denied
+
 @router.get("/{topic_id}", response_model=List[PostSchema])
 def get_posts_in_topic(topic_id: int,
                        db: Session = Depends(get_db),
@@ -22,14 +29,12 @@ def get_posts_in_topic(topic_id: int,
     """
     topic = db.query(Topic).filter(Topic.id.__eq__(topic_id)).first()
 
-    if not topic:
-        raise not_found
+    verify_topic_and_access(user, topic, db)
 
-    if can_user_see_topic(user, topic, db):
-        posts = db.query(Post).filter(Post.topic_id.__eq__(topic_id)).all()
-        posts = [post for post in posts]
-        return posts
-    return []
+
+    posts = db.query(Post).filter(Post.topic_id.__eq__(topic_id)).all()
+    posts = [post for post in posts] if posts else []
+    return posts
 
 @router.post("/{topic_id}/post", response_model=PostSchema)
 def add_post(topic_id: int,
@@ -43,11 +48,7 @@ def add_post(topic_id: int,
 
     topic = db.query(Topic).filter(Topic.id.__eq__(topic_id)).first()
 
-    if not topic:
-        raise not_found
-
-    if not can_user_see_topic(user, topic, db):
-        raise access_denied
+    verify_topic_and_access(user, topic, db)
 
     post = Post\
     (

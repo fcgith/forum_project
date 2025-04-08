@@ -16,10 +16,15 @@ def verify_unique(db: Session, user: UserCreate) -> None:
     """
     Verifies that a user does not exist in the database with the provided username and email or raises an error
     """
+    invalid_credentials = HTTPException(status_code=400, detail=f"Invalid credentials")
+
     username_check = db.query(Users).filter(Users.username.__eq__(user.username)).first()
+    if username_check:
+        raise invalid_credentials
+
     email_check = db.query(Users).filter(Users.email.__eq__(user.email)).first()
-    if username_check or email_check:
-        raise HTTPException(status_code=400, detail=f"Invalid credentials")
+    if email_check:
+        raise invalid_credentials
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
