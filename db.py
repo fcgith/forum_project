@@ -22,10 +22,9 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-def get_db():
+def get_db() -> SessionLocal:
     """
-    Creates a database connection and closes it after it has been used
-    :return: Session database
+    Returns a db session
     """
     db = SessionLocal()
     try:

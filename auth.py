@@ -3,12 +3,27 @@ from fastapi import HTTPException, APIRouter, Depends, Form
 
 from db import get_db
 from models import Users
-from schemas import RegisterResponse, UserCreate, LoginResponse, UserResponse
-from utils import hash_password, verify_password, create_access_token, verify_unique, get_current_user
+from schemas import RegisterResponse, UserCreate, LoginResponse
+from utils import hash_password, create_access_token
 
 router = APIRouter(
     tags=["auth"]
 )
+
+def verify_unique(db: Session, user: UserCreate) -> None:
+    """
+    Verifies that a user does not exist in the database with the provided username and email or raises an error
+    """
+    username_check = db.query(Users).filter(Users.username.__eq__(user.username)).first()
+    email_check = db.query(Users).filter(Users.email.__eq__(user.email)).first()
+    if username_check or email_check:
+        raise HTTPException(status_code=400, detail=f"Invalid credentials")
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """
+    Verifies if a hashed password matches with the provided non-hashed one
+    """
+    return hash_password(plain_password) == hashed_password
 
 @router.post("/register", response_model=RegisterResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)) -> RegisterResponse:

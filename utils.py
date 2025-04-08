@@ -36,21 +36,6 @@ def hash_password(password: str) -> str:
     """
     return hashlib.sha256(password.encode()).hexdigest()
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """
-    Verifies if a hashed password matches with the provided non-hashed one
-    """
-    return hash_password(plain_password) == hashed_password
-
-def verify_unique(db: Session, user: UserCreate) -> None:
-    """
-    Verifies that a user does not exist in the database with the provided username and email, raises error if failed
-    """
-    username_check = db.query(Users).filter(Users.username.__eq__(user.username)).first()
-    email_check = db.query(Users).filter(Users.email.__eq__(user.email)).first()
-    if username_check or email_check:
-        raise HTTPException(status_code=400, detail=f"User with the provided credentials already exists")
-
 def create_access_token(data: dict) -> str:
     """
     Creates an access token for the provided user (data)
@@ -117,10 +102,9 @@ def can_user_see_category(user: Users,
     return category.visibility and privilege.permission_type
 
 def can_user_see_topic(user: Users, topic: Type[Topic], db: Session) -> bool:
-    # TODO: Probably redundant but still a safety net
     if topic:
         category = db.query(Category).filter(Category.id.__eq__(topic.category_id)).first()
         if not can_user_see_category(user, category, db):
             raise access_denied
         return True
-    return False
+    raise not_found
