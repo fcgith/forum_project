@@ -35,7 +35,6 @@ def get_posts_in_topic(topic_id: int,
 def add_post(topic_id: int,
              db: Session = Depends(get_db),
              user: Users = Depends(get_current_user),
-             title: str = Form(...),
              content: str = Form(...)
 ) -> PostSchema:
     """
@@ -52,7 +51,6 @@ def add_post(topic_id: int,
 
     post = Post\
     (
-        title = title,
         content = content,
         user_id = user.id,
         topic_id = topic.id,
@@ -66,7 +64,6 @@ def add_post(topic_id: int,
     entry = db.query(Post).filter(Post.user_id.__eq__(user.id)).all()[-1]
 
     return PostSchema(id=entry.id,
-                      title=title,
                       content=content,
                       user_id=user.id,
                       topic_id=topic.id,
