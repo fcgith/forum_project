@@ -4,17 +4,8 @@ from auth import router as auth_router
 from categories import router as category_router
 from topics import router as topics_router
 from posts import router as posts_router
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://172.245.56.116:3080"],  # Frontend URL
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows OPTIONS, POST, etc.
-    allow_headers=["*"],
-)
 
 app.include_router(auth_router, prefix="/auth")
 # app.include_router(admin_router, prefix="/admin")
